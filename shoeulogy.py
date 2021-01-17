@@ -15,6 +15,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 class Shoeulogy():
 
     def __init__(self, access_token=None):
+        # Initialize the Shoeulogy object with athlete, activities, and gear information
         if access_token is None:
             access_token = os.getenv('STRAVA_ACCESS_TOKEN')
         self.configuration = swagger_client.Configuration()
@@ -44,13 +45,14 @@ class Shoeulogy():
         after = date_to_epoch(after)
         _fetched = self.activities_api.get_logged_in_athlete_activities(after=after)
         if len(_fetched) > 0:
-            print(f"Fetched {len(_fetched)}, the latests is on {_fetched[-1].start_date}")
+            # Strava API limits activity requests to 30 at a time
+            print(f"Fetched {len(_fetched)} activities, most recent is {_fetched[-1].start_date}")
             list_activities.extend(_fetched)
             if len(_fetched) == 30:
                 last_after = list_activities[-1].start_date
                 return self.get_logged_in_athlete_activities(after=last_after, list_activities=list_activities)
         else:
-            print("empty list")
+            print("No more activities")
         
         return list_activities
 
@@ -59,10 +61,9 @@ class Shoeulogy():
             activity = {}
         _fetched = self.activities_api.get_activity_by_id(id=activity_id)
         if _fetched:
-            print(f"Fetched {_fetched}")
             return _fetched
         else:
-            print("no activity with that ID")
+            print("ERROR: no activity with that ID")
         
         return activity
 
